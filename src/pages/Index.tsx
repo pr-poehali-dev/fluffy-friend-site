@@ -140,7 +140,7 @@ export default function Index() {
   const BG_IMG = "https://cdn.poehali.dev/projects/0f7748fd-e817-4818-b926-8236fdda06de/files/2040db2f-fbbb-4776-ac03-7ac4f4249294.jpg";
 
   return (
-    <div className="min-h-screen bg-background relative">
+    <div className="min-h-screen relative">
       {/* Background */}
       <div
         className="fixed inset-0 -z-10"
@@ -151,7 +151,7 @@ export default function Index() {
           backgroundAttachment: 'fixed',
         }}
       />
-      <div className="fixed inset-0 -z-10 bg-background/80 backdrop-blur-[2px]" />
+      <div className="fixed inset-0 -z-10" style={{ background: 'hsla(35,25%,97%,0.55)' }} />
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background/90 backdrop-blur-md border-b border-border">
         <div className="max-w-lg mx-auto px-4 h-16 flex items-center justify-between">
