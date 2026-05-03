@@ -68,6 +68,14 @@ const PETS_SEARCH = [
 
 type Tab = "feed" | "communities" | "search" | "profile";
 
+interface Comment {
+  id: number;
+  user: string;
+  avatarBg: string;
+  text: string;
+  time: string;
+}
+
 interface Post {
   id: number;
   user: string;
@@ -90,6 +98,35 @@ export default function Index() {
   const [profileTab, setProfileTab] = useState<"pets" | "posts">("pets");
   const [showCreatePost, setShowCreatePost] = useState(false);
   const [posts, setPosts] = useState<Post[]>(POSTS);
+  const [openComments, setOpenComments] = useState<Set<number>>(new Set());
+  const [commentTexts, setCommentTexts] = useState<Record<number, string>>({});
+  const [postComments, setPostComments] = useState<Record<number, Comment[]>>({
+    1: [{ id: 1, user: "Катя В.", avatarBg: "bg-[#8fa87a]", text: "Какой красавец! 😍", time: "1 час назад" }],
+    2: [],
+    3: [],
+  });
+
+  const toggleComments = (postId: number) => {
+    setOpenComments(prev => {
+      const next = new Set(prev);
+      if (next.has(postId)) { next.delete(postId); } else { next.add(postId); }
+      return next;
+    });
+  };
+
+  const submitComment = (postId: number) => {
+    const text = (commentTexts[postId] || "").trim();
+    if (!text) return;
+    const comment: Comment = {
+      id: Date.now(),
+      user: "Алина М.",
+      avatarBg: "bg-[#c8a97a]",
+      text,
+      time: "только что",
+    };
+    setPostComments(prev => ({ ...prev, [postId]: [...(prev[postId] || []), comment] }));
+    setCommentTexts(prev => ({ ...prev, [postId]: "" }));
+  };
 
   const [newPostText, setNewPostText] = useState("");
   const [newPostPet, setNewPostPet] = useState("");
@@ -252,14 +289,58 @@ export default function Index() {
                       />
                       {post.likes + (likedPosts.has(post.id) ? 1 : 0)}
                     </button>
-                    <button className="flex items-center gap-1.5 text-sm font-body text-muted-foreground hover:text-foreground transition-colors">
+                    <button
+                      onClick={() => toggleComments(post.id)}
+                      className={`flex items-center gap-1.5 text-sm font-body transition-colors ${openComments.has(post.id) ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+                    >
                       <Icon name="MessageCircle" size={18} />
-                      {post.comments}
+                      {(postComments[post.id]?.length ?? 0) + post.comments}
                     </button>
                     <button className="flex items-center gap-1.5 text-sm font-body text-muted-foreground hover:text-foreground transition-colors ml-auto">
                       <Icon name="Share2" size={16} />
                     </button>
                   </div>
+
+                  {/* Comments section */}
+                  {openComments.has(post.id) && (
+                    <div className="border-t border-border px-4 pt-3 pb-4 space-y-3 animate-fade-in" style={{ opacity: 0 }}>
+                      {(postComments[post.id] || []).map(c => (
+                        <div key={c.id} className="flex gap-2.5">
+                          <div className={`w-7 h-7 rounded-full ${c.avatarBg} flex items-center justify-center text-white text-xs font-body font-semibold flex-shrink-0`}>
+                            {c.user[0]}
+                          </div>
+                          <div className="bg-muted/60 rounded-2xl rounded-tl-sm px-3 py-2 flex-1">
+                            <div className="flex items-center gap-1.5 mb-0.5">
+                              <span className="text-xs font-body font-semibold text-foreground">{c.user}</span>
+                              <span className="text-[10px] font-body text-muted-foreground">{c.time}</span>
+                            </div>
+                            <p className="text-sm font-body text-foreground/85">{c.text}</p>
+                          </div>
+                        </div>
+                      ))}
+
+                      {/* Input */}
+                      <div className="flex gap-2.5 items-center pt-1">
+                        <div className="w-7 h-7 rounded-full bg-[#c8a97a] flex items-center justify-center text-white text-xs font-body font-semibold flex-shrink-0">А</div>
+                        <div className="flex-1 flex items-center gap-2 bg-muted/60 rounded-full px-3 py-2">
+                          <input
+                            value={commentTexts[post.id] || ""}
+                            onChange={e => setCommentTexts(prev => ({ ...prev, [post.id]: e.target.value }))}
+                            onKeyDown={e => { if (e.key === "Enter") submitComment(post.id); }}
+                            placeholder="Написать комментарий..."
+                            className="flex-1 bg-transparent text-sm font-body text-foreground placeholder:text-muted-foreground/60 outline-none"
+                          />
+                          <button
+                            onClick={() => submitComment(post.id)}
+                            disabled={!(commentTexts[post.id] || "").trim()}
+                            className="text-primary disabled:text-muted-foreground/40 transition-colors"
+                          >
+                            <Icon name="SendHorizontal" size={16} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </article>
               ))}
             </div>
