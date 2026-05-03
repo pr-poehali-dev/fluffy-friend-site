@@ -137,7 +137,7 @@ export default function Index() {
 
   const speciesOptions = ["Все", "Собака", "Кошка", "Кролик"];
 
-  const BG_IMG = "https://cdn.poehali.dev/projects/0f7748fd-e817-4818-b926-8236fdda06de/files/2040db2f-fbbb-4776-ac03-7ac4f4249294.jpg";
+  const BG_IMG = "https://cdn.poehali.dev/projects/0f7748fd-e817-4818-b926-8236fdda06de/files/9543ece1-9a29-4302-9a82-cd82c7165b4d.jpg";
 
   return (
     <div className="min-h-screen relative">
