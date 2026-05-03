@@ -524,21 +524,6 @@ export default function Index() {
 
               {profileTab === "pets" && (
                 <div className="space-y-3">
-                  {[
-                    { name: "Барон", breed: "Золотистый ретривер", age: "3 года", image: DOG_IMG, desc: "Добрый и активный. Обожает мячик и купание в реке." },
-                  ].map(pet => (
-                    <div key={pet.name} className="bg-card border border-border rounded-2xl overflow-hidden card-hover">
-                      <img src={pet.image} alt={pet.name} className="w-full h-48 object-cover" />
-                      <div className="p-4">
-                        <div className="flex items-center justify-between mb-1">
-                          <h3 className="font-display text-xl font-semibold">{pet.name}</h3>
-                          <span className="text-xs font-body bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full">{pet.age}</span>
-                        </div>
-                        <p className="text-sm font-body text-primary font-medium mb-2">{pet.breed}</p>
-                        <p className="text-sm font-body text-foreground/70">{pet.desc}</p>
-                      </div>
-                    </div>
-                  ))}
                   <button className="w-full py-3.5 rounded-2xl border-2 border-dashed border-border text-muted-foreground text-sm font-body hover:border-primary hover:text-primary transition-all flex items-center justify-center gap-2">
                     <Icon name="Plus" size={16} />
                     Добавить питомца
