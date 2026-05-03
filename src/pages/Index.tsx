@@ -183,7 +183,7 @@ export default function Index() {
                 { name: "Барон", avatar: DOG_IMG, isImg: true },
                 { name: "Луна", avatar: CAT_IMG, isImg: true },
                 { name: "Снежок", avatar: RABBIT_IMG, isImg: true },
-                { name: "Бобик", avatar: DOG_IMG, isImg: true },
+                { name: "Бобик", avatar: "https://cdn.poehali.dev/projects/0f7748fd-e817-4818-b926-8236fdda06de/files/d4613076-e102-4cb4-bff4-46474844696f.jpg", isImg: true },
               ].map((s, i) => (
                 <div key={i} className="flex flex-col items-center gap-1 flex-shrink-0 animate-fade-in" style={{ animationDelay: `${i * 0.06}s`, opacity: 0 }}>
                   <div className={`w-14 h-14 rounded-full border-2 ${i === 0 ? 'border-primary' : 'border-[hsl(14,45%,52%)]'} p-0.5 cursor-pointer`}>
