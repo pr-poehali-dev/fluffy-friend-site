@@ -1,0 +1,12 @@
+{
+  "tests": [
+    {
+      "name": "Get posts feed",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 200,
+      "expectedBody": "[]",
+      "bodyMatcher": "contains"
+    }
+  ]
+}
