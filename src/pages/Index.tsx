@@ -61,7 +61,7 @@ const COMMUNITIES = [
 ];
 
 const PETS_SEARCH = [
-  { id: 1, name: "Рекс", breed: "Немецкая овчарка", age: "2 года", city: "Москва", image: DOG_IMG, type: "Собака" },
+  { id: 1, name: "Рекс", breed: "Лабрадор", age: "2 года", city: "Москва", image: DOG_IMG, type: "Собака" },
   { id: 2, name: "Митси", breed: "Шотландская вислоухая", age: "4 года", city: "Казань", image: CAT_IMG, type: "Кошка" },
   { id: 3, name: "Пух", breed: "Ангорский кролик", age: "1 год", city: "Новосибирск", image: RABBIT_IMG, type: "Кролик" },
 ];
