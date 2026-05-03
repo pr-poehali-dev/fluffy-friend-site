@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Icon from "@/components/ui/icon";
 
 const DOG_IMG = "https://cdn.poehali.dev/projects/0f7748fd-e817-4818-b926-8236fdda06de/files/22e70b04-2a5d-476e-abe9-5024ae3850fc.jpg";
@@ -68,11 +68,33 @@ const PETS_SEARCH = [
 
 type Tab = "feed" | "communities" | "search" | "profile";
 
+interface Post {
+  id: number;
+  user: string;
+  avatar: string;
+  avatarBg: string;
+  petName: string;
+  species: string;
+  location: string;
+  time: string;
+  text: string;
+  image: string;
+  likes: number;
+  comments: number;
+}
+
 export default function Index() {
   const [activeTab, setActiveTab] = useState<Tab>("feed");
   const [likedPosts, setLikedPosts] = useState<Set<number>>(new Set());
   const [searchSpecies, setSearchSpecies] = useState("Все");
   const [profileTab, setProfileTab] = useState<"pets" | "posts">("pets");
+  const [showCreatePost, setShowCreatePost] = useState(false);
+  const [posts, setPosts] = useState<Post[]>(POSTS);
+
+  const [newPostText, setNewPostText] = useState("");
+  const [newPostPet, setNewPostPet] = useState("");
+  const [newPostImg, setNewPostImg] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const toggleLike = (id: number) => {
     setLikedPosts(prev => {
@@ -80,6 +102,37 @@ export default function Index() {
       if (next.has(id)) { next.delete(id); } else { next.add(id); }
       return next;
     });
+  };
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => setNewPostImg(ev.target?.result as string);
+    reader.readAsDataURL(file);
+  };
+
+  const handleCreatePost = () => {
+    if (!newPostText.trim() && !newPostImg) return;
+    const post: Post = {
+      id: Date.now(),
+      user: "Алина М.",
+      avatar: "А",
+      avatarBg: "bg-[#c8a97a]",
+      petName: newPostPet || "Питомец",
+      species: "Мой питомец",
+      location: "Москва",
+      time: "только что",
+      text: newPostText,
+      image: newPostImg || DOG_IMG,
+      likes: 0,
+      comments: 0,
+    };
+    setPosts(prev => [post, ...prev]);
+    setNewPostText("");
+    setNewPostPet("");
+    setNewPostImg(null);
+    setShowCreatePost(false);
   };
 
   const speciesOptions = ["Все", "Собака", "Кошка", "Кролик"];
@@ -136,7 +189,7 @@ export default function Index() {
 
             {/* Posts */}
             <div className="space-y-5 mt-2">
-              {POSTS.map((post, i) => (
+              {posts.map((post, i) => (
                 <article
                   key={post.id}
                   className="bg-card rounded-2xl overflow-hidden border border-border card-hover animate-fade-in"
@@ -408,6 +461,113 @@ export default function Index() {
           </div>
         )}
       </main>
+
+      {/* FAB — Create post */}
+      {activeTab === "feed" && (
+        <button
+          onClick={() => setShowCreatePost(true)}
+          className="fixed bottom-20 right-4 z-40 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center hover:scale-110 transition-transform active:scale-95"
+          style={{ boxShadow: '0 4px 20px hsla(22,55%,38%,0.4)' }}
+        >
+          <Icon name="Plus" size={24} />
+        </button>
+      )}
+
+      {/* Create Post Modal */}
+      {showCreatePost && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            onClick={() => setShowCreatePost(false)}
+          />
+          {/* Sheet */}
+          <div className="relative w-full max-w-lg bg-background rounded-t-3xl shadow-2xl animate-fade-in" style={{ opacity: 0 }}>
+            {/* Handle */}
+            <div className="flex justify-center pt-3 pb-1">
+              <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+            </div>
+
+            <div className="px-5 pb-2 pt-1 flex items-center justify-between">
+              <h3 className="font-display text-2xl font-semibold text-foreground">Новый пост</h3>
+              <button onClick={() => setShowCreatePost(false)} className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:bg-accent transition-colors">
+                <Icon name="X" size={16} />
+              </button>
+            </div>
+
+            <div className="px-5 pb-6 space-y-4">
+              {/* User row */}
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-[#c8a97a] flex items-center justify-center text-white font-body font-semibold">А</div>
+                <div>
+                  <div className="font-body font-semibold text-sm text-foreground">Алина М.</div>
+                  <input
+                    value={newPostPet}
+                    onChange={e => setNewPostPet(e.target.value)}
+                    placeholder="Имя питомца..."
+                    className="text-xs font-body text-primary bg-transparent border-none outline-none placeholder:text-muted-foreground/60 w-full"
+                  />
+                </div>
+              </div>
+
+              {/* Text */}
+              <textarea
+                value={newPostText}
+                onChange={e => setNewPostText(e.target.value)}
+                placeholder="Расскажи о своём питомце..."
+                rows={3}
+                className="w-full bg-muted/50 rounded-2xl px-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground/60 resize-none focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
+              />
+
+              {/* Image preview / upload */}
+              {newPostImg ? (
+                <div className="relative rounded-2xl overflow-hidden">
+                  <img src={newPostImg} alt="preview" className="w-full h-48 object-cover" />
+                  <button
+                    onClick={() => setNewPostImg(null)}
+                    className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/50 flex items-center justify-center text-white hover:bg-black/70 transition-colors"
+                  >
+                    <Icon name="X" size={14} />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-full h-32 rounded-2xl border-2 border-dashed border-border flex flex-col items-center justify-center gap-2 text-muted-foreground hover:border-primary hover:text-primary transition-all bg-muted/30"
+                >
+                  <Icon name="ImagePlus" size={24} />
+                  <span className="text-sm font-body">Добавить фото</span>
+                </button>
+              )}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleImageSelect}
+              />
+
+              {/* Actions */}
+              <div className="flex gap-3 pt-1">
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-full bg-muted text-muted-foreground text-sm font-body hover:bg-accent transition-colors"
+                >
+                  <Icon name="Camera" size={15} />
+                  Фото
+                </button>
+                <button
+                  onClick={handleCreatePost}
+                  disabled={!newPostText.trim() && !newPostImg}
+                  className="ml-auto px-6 py-2.5 rounded-full bg-primary text-primary-foreground text-sm font-body font-semibold disabled:opacity-40 hover:opacity-90 transition-all"
+                >
+                  Опубликовать
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Bottom Navigation */}
       <nav className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-md border-t border-border z-50">
