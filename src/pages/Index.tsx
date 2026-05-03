@@ -92,12 +92,20 @@ export default function Index() {
   const avatarInputRef = useRef<HTMLInputElement>(null);
 
   const [showEditProfile, setShowEditProfile] = useState(false);
-  const [profile, setProfile] = useState({
+
+  const defaultProfile = {
     name: "Алина Михайлова",
     city: "Москва",
     bio: "Люблю природу, животных и долгие прогулки. Хозяйка Барона уже 3 года 🐾",
     avatar: "",
     initial: "А",
+  };
+
+  const [profile, setProfile] = useState(() => {
+    try {
+      const saved = localStorage.getItem("pawspace_profile");
+      return saved ? JSON.parse(saved) : defaultProfile;
+    } catch { return defaultProfile; }
   });
   const [editProfile, setEditProfile] = useState(profile);
 
@@ -111,6 +119,7 @@ export default function Index() {
 
   const saveProfile = () => {
     setProfile(editProfile);
+    localStorage.setItem("pawspace_profile", JSON.stringify(editProfile));
     setShowEditProfile(false);
   };
 
