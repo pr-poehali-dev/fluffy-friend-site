@@ -6,50 +6,7 @@ const CAT_IMG = "https://cdn.poehali.dev/projects/0f7748fd-e817-4818-b926-8236fd
 const RABBIT_IMG = "https://cdn.poehali.dev/projects/0f7748fd-e817-4818-b926-8236fdda06de/files/0da7b96f-1cf1-426d-9f4a-1551dea68775.jpg";
 const OWNER_IMG = "https://cdn.poehali.dev/projects/0f7748fd-e817-4818-b926-8236fdda06de/files/f364a9d1-93a9-49e0-ac1c-4cdfa628821b.jpg";
 
-const POSTS = [
-  {
-    id: 1,
-    user: "Алина М.",
-    avatar: "А",
-    avatarBg: "bg-[#c8a97a]",
-    petName: "Барон",
-    species: "Золотистый ретривер",
-    location: "Москва",
-    time: "2 часа назад",
-    text: "Сегодня с Бароном нашли новый маршрут в Сокольниках — он был в восторге от осенних листьев! 🍂",
-    image: DOG_IMG,
-    likes: 84,
-    comments: 12,
-  },
-  {
-    id: 2,
-    user: "Дмитрий К.",
-    avatar: "Д",
-    avatarBg: "bg-[#8fa87a]",
-    petName: "Луна",
-    species: "Британская кошка",
-    location: "Санкт-Петербург",
-    time: "5 часов назад",
-    text: "Луна освоила новое место для сна — прямо у окна с видом на дождь. Говорит, вдохновляет.",
-    image: CAT_IMG,
-    likes: 127,
-    comments: 23,
-  },
-  {
-    id: 3,
-    user: "Мария С.",
-    avatar: "М",
-    avatarBg: "bg-[#c87a7a]",
-    petName: "Снежок",
-    species: "Карликовый кролик",
-    location: "Екатеринбург",
-    time: "1 день назад",
-    text: "Снежок первый раз вышел в сад — сначала боялся, а потом не хотел возвращаться домой!",
-    image: RABBIT_IMG,
-    likes: 56,
-    comments: 8,
-  },
-];
+const POSTS: Post[] = [];
 
 const COMMUNITIES = [
   { id: 1, name: "Золотистые ретриверы", members: "12 450", icon: "🐕", color: "bg-amber-100 text-amber-800 border-amber-200" },
@@ -239,6 +196,19 @@ export default function Index() {
 
             {/* Posts */}
             <div className="space-y-5 mt-2">
+              {posts.length === 0 && (
+                <div className="flex flex-col items-center justify-center py-16 text-center animate-fade-in" style={{ opacity: 0 }}>
+                  <div className="text-5xl mb-4">🐾</div>
+                  <h3 className="font-display text-2xl font-semibold text-foreground mb-2">Пока постов нет</h3>
+                  <p className="text-sm font-body text-muted-foreground mb-5">Поделитесь фото своего питомца первым!</p>
+                  <button
+                    onClick={() => setShowCreatePost(true)}
+                    className="px-6 py-2.5 rounded-full bg-primary text-primary-foreground text-sm font-body font-semibold hover:opacity-90 transition-all"
+                  >
+                    Создать пост
+                  </button>
+                </div>
+              )}
               {posts.map((post, i) => (
                 <article
                   key={post.id}
