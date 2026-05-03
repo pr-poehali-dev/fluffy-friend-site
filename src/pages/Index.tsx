@@ -89,6 +89,30 @@ export default function Index() {
   const [newPostPet, setNewPostPet] = useState("");
   const [newPostImg, setNewPostImg] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+
+  const [showEditProfile, setShowEditProfile] = useState(false);
+  const [profile, setProfile] = useState({
+    name: "Алина Михайлова",
+    city: "Москва",
+    bio: "Люблю природу, животных и долгие прогулки. Хозяйка Барона уже 3 года 🐾",
+    avatar: "",
+    initial: "А",
+  });
+  const [editProfile, setEditProfile] = useState(profile);
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => setEditProfile(p => ({ ...p, avatar: ev.target?.result as string }));
+    reader.readAsDataURL(file);
+  };
+
+  const saveProfile = () => {
+    setProfile(editProfile);
+    setShowEditProfile(false);
+  };
 
   const toggleLike = (id: number) => {
     setLikedPosts(prev => {
@@ -157,8 +181,13 @@ export default function Index() {
             <button className="w-9 h-9 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:bg-accent transition-colors">
               <Icon name="Bell" size={18} />
             </button>
-            <button className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-body font-semibold text-sm">
-              А
+            <button
+              onClick={() => { setActiveTab("profile"); }}
+              className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-body font-semibold text-sm overflow-hidden"
+            >
+              {profile.avatar
+                ? <img src={profile.avatar} alt="avatar" className="w-full h-full object-cover" />
+                : profile.initial}
             </button>
           </div>
         </div>
@@ -448,20 +477,25 @@ export default function Index() {
               </div>
               <div className="px-5 -mt-8 pb-4">
                 <div className="flex items-end justify-between mb-3">
-                  <div className="w-16 h-16 rounded-full bg-primary border-4 border-background flex items-center justify-center text-primary-foreground font-body font-bold text-xl">
-                    А
+                  <div className="w-16 h-16 rounded-full bg-primary border-4 border-background flex items-center justify-center text-primary-foreground font-body font-bold text-xl overflow-hidden">
+                    {profile.avatar
+                      ? <img src={profile.avatar} alt="avatar" className="w-full h-full object-cover" />
+                      : profile.initial}
                   </div>
-                  <button className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-card border border-border text-sm font-body text-foreground hover:border-primary transition-all">
-                    <Icon name="Settings" size={14} />
-                    Настройки
+                  <button
+                    onClick={() => { setEditProfile(profile); setShowEditProfile(true); }}
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-card border border-border text-sm font-body text-foreground hover:border-primary transition-all"
+                  >
+                    <Icon name="Pencil" size={14} />
+                    Редактировать
                   </button>
                 </div>
-                <h2 className="font-display text-2xl font-semibold text-foreground">Алина Михайлова</h2>
+                <h2 className="font-display text-2xl font-semibold text-foreground">{profile.name}</h2>
                 <div className="flex items-center gap-1 mt-0.5 mb-2">
                   <Icon name="MapPin" size={13} className="text-[hsl(14,45%,52%)]" />
-                  <span className="text-sm font-body text-muted-foreground">Москва</span>
+                  <span className="text-sm font-body text-muted-foreground">{profile.city}</span>
                 </div>
-                <p className="text-sm font-body text-foreground/70 leading-relaxed">Люблю природу, животных и долгие прогулки. Хозяйка Барона уже 3 года 🐾</p>
+                <p className="text-sm font-body text-foreground/70 leading-relaxed">{profile.bio}</p>
 
                 <div className="flex gap-5 mt-4 pb-4 border-b border-border">
                   {[["128", "публикаций"], ["2 340", "подписчиков"], ["186", "подписок"]].map(([n, l]) => (
@@ -525,6 +559,81 @@ export default function Index() {
           </div>
         )}
       </main>
+
+      {/* Edit Profile Modal */}
+      {showEditProfile && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowEditProfile(false)} />
+          <div className="relative w-full max-w-lg bg-background rounded-t-3xl shadow-2xl animate-fade-in" style={{ opacity: 0 }}>
+            <div className="flex justify-center pt-3 pb-1">
+              <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+            </div>
+            <div className="px-5 pb-2 pt-1 flex items-center justify-between">
+              <h3 className="font-display text-2xl font-semibold text-foreground">Редактировать профиль</h3>
+              <button onClick={() => setShowEditProfile(false)} className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:bg-accent transition-colors">
+                <Icon name="X" size={16} />
+              </button>
+            </div>
+
+            <div className="px-5 pb-8 space-y-4">
+              {/* Avatar */}
+              <div className="flex flex-col items-center gap-2 py-2">
+                <div
+                  onClick={() => avatarInputRef.current?.click()}
+                  className="w-20 h-20 rounded-full bg-primary border-4 border-muted flex items-center justify-center text-primary-foreground font-body font-bold text-2xl overflow-hidden cursor-pointer hover:opacity-80 transition-opacity relative"
+                >
+                  {editProfile.avatar
+                    ? <img src={editProfile.avatar} alt="avatar" className="w-full h-full object-cover" />
+                    : editProfile.initial}
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-full opacity-0 hover:opacity-100 transition-opacity">
+                    <Icon name="Camera" size={20} className="text-white" />
+                  </div>
+                </div>
+                <span className="text-xs font-body text-muted-foreground">Нажми чтобы сменить фото</span>
+                <input ref={avatarInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
+              </div>
+
+              {/* Name */}
+              <div>
+                <label className="text-xs font-body text-muted-foreground mb-1 block">Имя</label>
+                <input
+                  value={editProfile.name}
+                  onChange={e => setEditProfile(p => ({ ...p, name: e.target.value, initial: e.target.value[0]?.toUpperCase() || "А" }))}
+                  className="w-full bg-muted/50 rounded-2xl px-4 py-3 text-sm font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
+                />
+              </div>
+
+              {/* City */}
+              <div>
+                <label className="text-xs font-body text-muted-foreground mb-1 block">Город</label>
+                <input
+                  value={editProfile.city}
+                  onChange={e => setEditProfile(p => ({ ...p, city: e.target.value }))}
+                  className="w-full bg-muted/50 rounded-2xl px-4 py-3 text-sm font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
+                />
+              </div>
+
+              {/* Bio */}
+              <div>
+                <label className="text-xs font-body text-muted-foreground mb-1 block">О себе</label>
+                <textarea
+                  value={editProfile.bio}
+                  onChange={e => setEditProfile(p => ({ ...p, bio: e.target.value }))}
+                  rows={3}
+                  className="w-full bg-muted/50 rounded-2xl px-4 py-3 text-sm font-body text-foreground resize-none focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
+                />
+              </div>
+
+              <button
+                onClick={saveProfile}
+                className="w-full py-3 rounded-full bg-primary text-primary-foreground text-sm font-body font-semibold hover:opacity-90 transition-all"
+              >
+                Сохранить
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* FAB — Create post */}
       {activeTab === "feed" && (
